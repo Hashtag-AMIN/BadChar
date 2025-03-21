@@ -757,7 +757,8 @@ class BurpExtender(IBurpExtender, IIntruderPayloadGeneratorFactory, ITab):
         callbacks.registerIntruderPayloadGeneratorFactory(self)
 
         self.initUI()
-        print("Extension loaded: BadChar Wordlist Generator\nThis tool allows you to generate custom wordlists with bad characters, encoding options, "
+        self.generateWordlist(None)
+        print("\nExtension loaded: BadChar Wordlist Generator\nThis tool allows you to generate custom wordlists with bad characters, encoding options, "
             "and add prefix/suffix in BadChars or Custom payloads.\n\n\n\n\nHashtag_AMIN\nhttps://github.com/Hashtag-AMIN\nHappy Hunting ;)")
 
     def initUI(self):
@@ -777,7 +778,7 @@ class BurpExtender(IBurpExtender, IIntruderPayloadGeneratorFactory, ITab):
         self.unicodeEncodeButton = JButton("Unicode Encode", actionPerformed=self.unicodeEncodeChar)
         self.hexEncodeButton = JButton("Hex Encode", actionPerformed=self.hexEncodeChar)
 
-        self.generateButton = JButton("Generate Wordlist", actionPerformed=self.generateWordlist)
+        self.generateButton = JButton("Generate/Reset", actionPerformed=self.generateWordlist)
         self.applyButton = JButton("Apply Prefix/Suffix", actionPerformed=self.applyPrefixSuffix)
         self.clearButton = JButton("Clear Wordlist", actionPerformed=self.clearWordlist)
         self.copyButton = JButton("Copy to Clipboard", actionPerformed=self.copyToClipboard)
@@ -862,7 +863,7 @@ class BurpExtender(IBurpExtender, IIntruderPayloadGeneratorFactory, ITab):
 
     def generateWordlist(self, event):
         self.base_wordlist = badchars
-        self.updateWordlistDisplay()
+        self.wordlistArea.setText("\n".join(self.base_wordlist))
 
     def clearWordlist(self, event):
         self.wordlistArea.setText("")
@@ -870,12 +871,9 @@ class BurpExtender(IBurpExtender, IIntruderPayloadGeneratorFactory, ITab):
     def applyPrefixSuffix(self, event):
         prefix = self.prefixField.getText()
         suffix = self.suffixField.getText()
-        updated_words = ["{}{}{}".format(prefix, word, suffix) for word in self.base_wordlist]
+        words = self.wordlistArea.getText().splitlines()
+        updated_words = ["{}{}{}".format(prefix, word.encode("utf-8"), suffix) for word in words]
         self.wordlistArea.setText("\n".join(updated_words))
-        self._callbacks.printOutput("Prefix and suffix applied.")
-
-    def updateWordlistDisplay(self):
-        self.wordlistArea.setText("\n".join(self.base_wordlist))
 
     def base64Encode(self, event):
         words = self.wordlistArea.getText().splitlines()
@@ -906,7 +904,6 @@ class BurpExtender(IBurpExtender, IIntruderPayloadGeneratorFactory, ITab):
         wordlist = self.wordlistArea.getText()
         clipboard = tk.getDefaultToolkit().getSystemClipboard()
         clipboard.setContents(dt.StringSelection(wordlist), None)
-        self._callbacks.printOutput("Wordlist copied to clipboard.")
 
     def saveToFile(self, event):
         fileChooser = JFileChooser()
@@ -921,13 +918,14 @@ class BurpExtender(IBurpExtender, IIntruderPayloadGeneratorFactory, ITab):
         return "BadChar"
 
     def createNewInstance(self, attack):
-        return BadCharactersPayloadGenerator(self._callbacks)
+        self.base_wordlist = self.wordlistArea.getText().splitlines()
+        return BadCharactersPayloadGenerator(self._callbacks, self.base_wordlist)
 
 
 class BadCharactersPayloadGenerator(IIntruderPayloadGenerator):
-    def __init__(self, callbacks):
+    def __init__(self, callbacks, wordlist):
         self._callbacks = callbacks
-        self._payloads = badchars
+        self._payloads = wordlist
         self._current_index = 0
         print("Loaded {} payloads".format(len(self._payloads)))
 

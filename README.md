@@ -17,19 +17,20 @@
 ### Wordlist Generator
 
 1. Navigate to the **BadChar** tab.
-2. Click "Generate Wordlist" to create a list of bad characters.
-3. Add a prefix or suffix using the text fields and click "Apply Prefix/Suffix."
-4. Choose an encoding method by clicking the respective button (e.g., "Base64 Encode").
-5. Save the wordlist to a file or copy it to your clipboard.
+2. Default Wordlist generate when extension run, also able reset with "Generate/Reset" button
+3. Add a prefix or suffix using the text fields and click "Apply Prefix/Suffix"
+4. Choose an encoding method by clicking the respective button (e.g., "Base64 Encode")
+5. Save the wordlist to a file or copy it to your clipboard
 6. all steps are flexible and able to choose without order
-7. Click "Generate Wordlist", "Apply Prefix/Suffix" or "Clear Wordlist" for return each step
+7. Click "Generate/Reset", "Apply Prefix/Suffix" or "Clear Wordlist" for return each step
 
 ### Integration with Intruder
 
-1. Send a request to Burp Suite Intruder.
-2. In the **Payloads** menu, choose "Extension-generated."
-3. Select "BadChar" as the generator.
-4. Start the attack.
+1. Send a request to Burp Suite Intruder
+2. Prepare wordlist in BadChar tab, able to edit or encode your payload for send to Intruder with default or custom wordlist
+3. In the **Payloads** menu, choose "Extension-generated."
+4. Select "BadChar" as the generator.
+5. Start the attack.
 
 ## Example Use Case
 
@@ -58,7 +59,12 @@
 
 <img src="./Img/badchar4.png">
 
-### Easy save or copy clipboar
+
+- Edit and customize your payloads
+
+<img src="./Img/badchar5.png">
+
+### Easy save or copy clipboard
 
 - Save wordlists to a file or copy them to your clipboard.
 
